@@ -45,7 +45,6 @@ private
   end
 
   def initialize_platform_specifications(platform_specs)
-    @platform = platform_specs.platform
     @syscall_tracking_lib = platform_specs.syscall_tracking_lib
     @pid_argument = platform_specs.pid_argument
     @syscalls = platform_specs.syscalls
@@ -75,12 +74,11 @@ class PlatformSpecifications
   DEFAULT_PID_ARGUMENT = '-p'
   private_constant :DEFAULT_PID_ARGUMENT
 
-  attr_reader :platform
   attr_reader :syscall_tracking_lib
+  attr_reader :pid_argument
   attr_reader :syscalls
 
-  def initialize(platform = DEFAULT_PLATFORM, syscall_tracking_lib = DEFAULT_TRACKING_LIB, pid_argument = DEFAULT_PID_ARGUMENT, syscalls = DEFAULT_SYSCALLS)
-    @platform = platform
+  def initialize(syscall_tracking_lib = DEFAULT_TRACKING_LIB, pid_argument = DEFAULT_PID_ARGUMENT, syscalls = DEFAULT_SYSCALLS)
     @syscall_tracking_lib = syscall_tracking_lib
     @pid_argument = pid_argument
     @syscalls = syscalls
