@@ -46,7 +46,7 @@ private
 
   def initialize_platform_specifications(platform_specs)
     @syscall_tracking_lib = platform_specs.syscall_tracking_lib
-    @pid_argument = platform_specs.pid_argument
+    @arguments = platform_specs.arguments
     @syscalls = platform_specs.syscalls
   end
 
@@ -57,7 +57,7 @@ private
   end
 
   def start_tracking_process
-    `#{@syscall_tracking_lib} #{@pid_argument} #{Process.pid}`
+    `#{@syscall_tracking_lib} #{@arguments} #{Process.pid}`
   end
 end
 
@@ -71,16 +71,16 @@ class PlatformSpecifications
   DEFAULT_SYSCALLS = %w[brk]
   private_constant :DEFAULT_SYSCALLS
 
-  DEFAULT_PID_ARGUMENT = '-p'
-  private_constant :DEFAULT_PID_ARGUMENT
+  arguments = '-p'
+  private_constant :arguments
 
   attr_reader :syscall_tracking_lib
-  attr_reader :pid_argument
+  attr_reader :arguments
   attr_reader :syscalls
 
-  def initialize(syscall_tracking_lib = DEFAULT_TRACKING_LIB, pid_argument = DEFAULT_PID_ARGUMENT, syscalls = DEFAULT_SYSCALLS)
+  def initialize(syscall_tracking_lib = DEFAULT_TRACKING_LIB, arguments = DEFAULT_PID_ARGUMENT, syscalls = DEFAULT_SYSCALLS)
     @syscall_tracking_lib = syscall_tracking_lib
-    @pid_argument = pid_argument
+    @arguments = arguments
     @syscalls = syscalls
   end
 end
