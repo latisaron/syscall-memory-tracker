@@ -1,9 +1,8 @@
 require 'pry'
 
-$_internal_R9MDSAK837I_tracking_started = nil
 class SyscallMemorySeparator
-  `rm -f /tmp/syscall_mem_separator/null`
   def self.setup_separator(included_paths, platform_specs)
+    `rm -f /tmp/syscall_mem_separator/null`
     check_args(included_paths, platform_specs)
     initialize_platform_specifications(platform_specs)
     start_tracking_process
@@ -18,7 +17,6 @@ class SyscallMemorySeparator
           "I-RB-SYSCALL-DELIM : END : #{tp.path} : #{tp.method_id}"
         end
       )
-      end
     end
   end
 
@@ -44,41 +42,40 @@ private
     end
   end
 
-  def initialize_platform_specifications(platform_specs)
+  def self.initialize_platform_specifications(platform_specs)
     @syscall_tracking_lib = platform_specs.syscall_tracking_lib
     @arguments = platform_specs.arguments
     @syscalls = platform_specs.syscalls
   end
 
-  def dummy_write_syscall_for_delimitation(txt)
+  def self.dummy_write_syscall_for_delimitation(txt)
     File.open('/tmp/syscall_mem_separator/null', 'w') do |f|
       f.write(txt)
     end
   end
 
-  def start_tracking_process
-    `#{@syscall_tracking_lib} #{@arguments} #{Process.pid}`
+  def self.start_tracking_process
+    fork do
+      `#{@syscall_tracking_lib} #{@arguments}`
+    end
   end
 end
 
-class PlatformSpecifications
-  DEFAULT_PLATFORM = 'linux'
-  private_constant :DEFAULT_PLATFORM
-  
+class PlatformSpecifications  
   DEFAULT_TRACKING_LIB = 'strace'
   private_constant :DEFAULT_TRACKING_LIB
   
   DEFAULT_SYSCALLS = %w[brk]
   private_constant :DEFAULT_SYSCALLS
 
-  arguments = '-p'
-  private_constant :arguments
+  DEFAULT_ARGUMENTS = "-p #{Process.pid}"
+  private_constant :DEFAULT_ARGUMENTS
 
   attr_reader :syscall_tracking_lib
   attr_reader :arguments
   attr_reader :syscalls
 
-  def initialize(syscall_tracking_lib = DEFAULT_TRACKING_LIB, arguments = DEFAULT_PID_ARGUMENT, syscalls = DEFAULT_SYSCALLS)
+  def initialize(syscall_tracking_lib: DEFAULT_TRACKING_LIB, arguments: DEFAULT_ARGUMENTS, syscalls: DEFAULT_SYSCALLS)
     @syscall_tracking_lib = syscall_tracking_lib
     @arguments = arguments
     @syscalls = syscalls
