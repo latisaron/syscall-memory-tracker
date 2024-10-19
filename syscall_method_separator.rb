@@ -4,7 +4,7 @@ class SyscallMemorySeparator
   def self.setup_separator(included_paths, platform_specs)
     `rm -f /tmp/syscall_mem_separator/null`
     check_args(included_paths, platform_specs)
-    initialize_platform_specifications(platform_specs)
+    initialize_platform_specifications(platform_specs)    
     start_tracking_process
 
     @tp = TracePoint.new(:call, :return) do |tp|
@@ -12,9 +12,11 @@ class SyscallMemorySeparator
 
       dummy_write_syscall_for_delimitation(
         if tp.event == :call
-          "I-RB-SYSCALL-DELIM : START : #{tp.path} : #{tp.method_id}"
+          # I-RB-SYSCALL-DELIM:START
+          "IRSDS:#{tp.path}:#{tp.method_id}"
         elsif tp.event == :return
-          "I-RB-SYSCALL-DELIM : END : #{tp.path} : #{tp.method_id}"
+          # I-RB-SYSCALL-DELIM:END
+          "IRSDE:#{tp.path}:#{tp.method_id}"
         end
       )
     end
@@ -58,26 +60,5 @@ private
     fork do
       `#{@syscall_tracking_lib} #{@arguments}`
     end
-  end
-end
-
-class PlatformSpecifications  
-  DEFAULT_TRACKING_LIB = 'strace'
-  private_constant :DEFAULT_TRACKING_LIB
-  
-  DEFAULT_SYSCALLS = %w[brk]
-  private_constant :DEFAULT_SYSCALLS
-
-  DEFAULT_ARGUMENTS = "-p #{Process.pid}"
-  private_constant :DEFAULT_ARGUMENTS
-
-  attr_reader :syscall_tracking_lib
-  attr_reader :arguments
-  attr_reader :syscalls
-
-  def initialize(syscall_tracking_lib: DEFAULT_TRACKING_LIB, arguments: DEFAULT_ARGUMENTS, syscalls: DEFAULT_SYSCALLS)
-    @syscall_tracking_lib = syscall_tracking_lib
-    @arguments = arguments
-    @syscalls = syscalls
   end
 end
